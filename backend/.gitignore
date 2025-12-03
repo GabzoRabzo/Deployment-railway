@@ -2,3 +2,5 @@
 .env.docker
 node_modules/
 uploads/
+__pycache__
+.venv/

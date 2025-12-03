@@ -1,10 +1,16 @@
-node_modules
-npm-debug.log
-.env
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
 uploads/*
-.git
-.gitignore
-*.md
-tests
-scripts
-Archivos MySQL necesarios
+!uploads/.gitkeep
+.env
+.DS_Store
