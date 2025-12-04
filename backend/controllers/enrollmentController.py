@@ -191,11 +191,11 @@ async def cancel_enrollment(student_id: int, enrollment_id: int, db: asyncpg.Con
     if enrollment['status'] != 'pendiente':
         return {"error": "Solo se pueden cancelar matrículas pendientes"}
     
-    # Check if there are payments or vouchers
+    # Check if there are payments or vouchers (like Node.js)
     has_payments = await db.fetchrow(
         """SELECT COUNT(*) as count FROM installments i
            JOIN payment_plans pp ON i.payment_plan_id = pp.id
-           WHERE pp.enrollment_id = $1 AND (i.status != 'pending' OR i.voucher_path IS NOT NULL)""",
+           WHERE pp.enrollment_id = $1 AND (i.status = 'paid' OR i.voucher_url IS NOT NULL)""",
         enrollment_id
     )
     
