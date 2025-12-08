@@ -30,6 +30,7 @@ import {
   ExitToApp as LogoutIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import './admin-layout.css';
 
 const drawerWidth = 240;
 
@@ -64,7 +65,7 @@ const AdminLayout = () => {
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
+        <Typography variant="h6" noWrap component="div" className="admin-drawer-title">
           Admin Panel
         </Typography>
       </Toolbar>
@@ -73,14 +74,15 @@ const AdminLayout = () => {
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
+              className="admin-menu-item"
               selected={location.pathname === item.path}
               onClick={() => {
                 navigate(item.path);
                 if (isMobile) setMobileOpen(false);
               }}
             >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
+              <ListItemIcon className="admin-menu-icon">{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} className="admin-menu-text" />
             </ListItemButton>
           </ListItem>
         ))}
@@ -88,8 +90,8 @@ const AdminLayout = () => {
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
-            <ListItemIcon>
+          <ListItemButton onClick={handleLogout} className="admin-logout-item">
+            <ListItemIcon className="admin-menu-icon">
               <LogoutIcon />
             </ListItemIcon>
             <ListItemText primary="Cerrar Sesión" />
@@ -103,6 +105,7 @@ const AdminLayout = () => {
     <Box sx={{ display: 'flex' }}>
       <AppBar
         position="fixed"
+        className="admin-appbar"
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
@@ -114,14 +117,15 @@ const AdminLayout = () => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
+            className="admin-menu-button"
             sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }} className="admin-appbar-title">
             Sistema de Academia - Administrador
           </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
+          <Typography variant="body2" className="admin-appbar-user">
             {user?.username || user?.name || 'Admin'}
           </Typography>
         </Toolbar>
@@ -134,6 +138,7 @@ const AdminLayout = () => {
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
+          className="admin-drawer"
           ModalProps={{
             keepMounted: true,
           }}
@@ -146,6 +151,7 @@ const AdminLayout = () => {
         </Drawer>
         <Drawer
           variant="permanent"
+          className="admin-drawer"
           sx={{
             display: { xs: 'none', md: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },

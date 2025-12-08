@@ -30,6 +30,7 @@ import {
   Payment as PaymentIcon,
 } from '@mui/icons-material';
 import { adminAPI } from '../../services/api';
+import './admin-dashboard.css';
 
 const AdminDashboard = () => {
   const [dashboard, setDashboard] = useState([]);
@@ -59,14 +60,14 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box className="admin-loading">
         <CircularProgress />
       </Box>
     );
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return <Alert severity="error" className="admin-alert">{error}</Alert>;
   }
 
   // Derivar lista de ciclos y aplicar filtro por ciclo
@@ -174,14 +175,14 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
+    <Box className="admin-dashboard">
+      <Typography variant="h4" gutterBottom className="admin-dashboard-title">
         Dashboard Administrativo
       </Typography>
 
       {/* Filtro por ciclo */}
-      <Box mb={3}>
-        <FormControl size="small" sx={{ minWidth: 220 }}>
+      <Box mb={3} className="admin-filters">
+        <FormControl size="small" sx={{ minWidth: 220 }} className="admin-select">
           <InputLabel id="cycle-filter-label">Ciclo</InputLabel>
           <Select
             labelId="cycle-filter-label"
@@ -202,60 +203,68 @@ const AdminDashboard = () => {
       {/* Estadísticas */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card className="admin-stat-card admin-fade-in">
             <CardContent>
               <Box display="flex" alignItems="center">
-                <PeopleIcon color="primary" sx={{ mr: 2, fontSize: 40 }} />
+                <Box className="admin-stat-icon primary">
+                  <PeopleIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
                 <Box>
-                  <Typography color="textSecondary" gutterBottom>
+                  <Typography className="admin-stat-label">
                     Estudiantes
                   </Typography>
-                  <Typography variant="h4">{stats.totalStudents}</Typography>
+                  <Typography className="admin-stat-number">{stats.totalStudents}</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card className="admin-stat-card admin-fade-in">
             <CardContent>
               <Box display="flex" alignItems="center">
-                <AssignmentIcon color="warning" sx={{ mr: 2, fontSize: 40 }} />
+                <Box className="admin-stat-icon warning">
+                  <AssignmentIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
                 <Box>
-                  <Typography color="textSecondary" gutterBottom>
+                  <Typography className="admin-stat-label">
                     Matrículas Pendientes
                   </Typography>
-                  <Typography variant="h4">{stats.pendingEnrollments}</Typography>
+                  <Typography className="admin-stat-number">{stats.pendingEnrollments}</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card className="admin-stat-card admin-fade-in">
             <CardContent>
               <Box display="flex" alignItems="center">
-                <PaymentIcon color="success" sx={{ mr: 2, fontSize: 40 }} />
+                <Box className="admin-stat-icon success">
+                  <PaymentIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
                 <Box>
-                  <Typography color="textSecondary" gutterBottom>
+                  <Typography className="admin-stat-label">
                     Total Pagado
                   </Typography>
-                  <Typography variant="h4">S/. {stats.totalPaid.toFixed(2)}</Typography>
+                  <Typography className="admin-stat-number">S/. {stats.totalPaid.toFixed(2)}</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card className="admin-stat-card admin-fade-in">
             <CardContent>
               <Box display="flex" alignItems="center">
-                <PaymentIcon color="error" sx={{ mr: 2, fontSize: 40 }} />
+                <Box className="admin-stat-icon danger">
+                  <PaymentIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
                 <Box>
-                  <Typography color="textSecondary" gutterBottom>
+                  <Typography className="admin-stat-label">
                     Total Pendiente
                   </Typography>
-                  <Typography variant="h4">S/. {stats.totalPending.toFixed(2)}</Typography>
+                  <Typography className="admin-stat-number">S/. {stats.totalPending.toFixed(2)}</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -268,30 +277,30 @@ const AdminDashboard = () => {
         <Tabs
           value={activeTab}
           onChange={(_, value) => setActiveTab(value)}
-          indicatorColor="primary"
-          textColor="primary"
+          className="admin-tabs"
+          TabIndicatorProps={{ className: 'admin-tab-indicator' }}
         >
-          <Tab label="Resumen" value="summary" />
-          <Tab label="Pagos" value="payments" />
-          <Tab label="Asistencia" value="attendance" />
+          <Tab label="Resumen" value="summary" className="admin-tab" />
+          <Tab label="Pagos" value="payments" className="admin-tab" />
+          <Tab label="Asistencia" value="attendance" className="admin-tab" />
         </Tabs>
       </Box>
 
       {/* Contenido de pestañas */}
       {activeTab === 'summary' && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
+        <TableContainer component={Paper} className="admin-table-container">
+          <Table className="admin-table">
+            <TableHead className="admin-table-head">
               <TableRow>
-                <TableCell>Estudiante</TableCell>
-                <TableCell>DNI</TableCell>
-                <TableCell>Ciclo</TableCell>
-                <TableCell>Curso/Paquete</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Asistencia</TableCell>
-                <TableCell>Pagado</TableCell>
-                <TableCell>Pendiente</TableCell>
-                <TableCell>Alerta</TableCell>
+                <TableCell className="admin-table-head-cell">Estudiante</TableCell>
+                <TableCell className="admin-table-head-cell">DNI</TableCell>
+                <TableCell className="admin-table-head-cell">Ciclo</TableCell>
+                <TableCell className="admin-table-head-cell">Curso/Paquete</TableCell>
+                <TableCell className="admin-table-head-cell">Estado</TableCell>
+                <TableCell className="admin-table-head-cell">Asistencia</TableCell>
+                <TableCell className="admin-table-head-cell">Pagado</TableCell>
+                <TableCell className="admin-table-head-cell">Pendiente</TableCell>
+                <TableCell className="admin-table-head-cell">Alerta</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -313,19 +322,20 @@ const AdminDashboard = () => {
                   return true;
                 })
                 .map((row) => (
-                  <TableRow key={`${row.student_id}-${row.enrollment_id}`}>
-                    <TableCell>{row.student_name}</TableCell>
-                    <TableCell>{row.dni}</TableCell>
-                    <TableCell>{row.cycle_name}</TableCell>
-                    <TableCell>{row.enrolled_item}</TableCell>
-                    <TableCell>
+                  <TableRow key={`${row.student_id}-${row.enrollment_id}`} className="admin-table-row">
+                    <TableCell className="admin-table-cell">{row.student_name}</TableCell>
+                    <TableCell className="admin-table-cell">{row.dni}</TableCell>
+                    <TableCell className="admin-table-cell">{row.cycle_name}</TableCell>
+                    <TableCell className="admin-table-cell">{row.enrolled_item}</TableCell>
+                    <TableCell className="admin-table-cell">
                       <Chip
                         label={row.enrollment_status}
                         color={getStatusColor(row.enrollment_status)}
                         size="small"
+                        className="admin-chip"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="admin-table-cell">
                       {(() => {
                         if (!row.start_date) return '-';
                         const start = new Date(row.start_date);
@@ -333,13 +343,13 @@ const AdminDashboard = () => {
                         return `${parseFloat(row.attendance_pct || 0).toFixed(1)}%`;
                       })()}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="admin-table-cell">
                       S/. {parseFloat(row.total_paid || 0).toFixed(2)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="admin-table-cell">
                       S/. {parseFloat(row.total_pending || 0).toFixed(2)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="admin-table-cell">
                       {(() => {
                         const label = row.alert_status || 'En regla';
 
@@ -395,18 +405,18 @@ const AdminDashboard = () => {
       )}
 
       {activeTab === 'payments' && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
+        <TableContainer component={Paper} className="admin-table-container">
+          <Table className="admin-table">
+            <TableHead className="admin-table-head">
               <TableRow>
-                <TableCell>Estudiante</TableCell>
-                <TableCell>Ciclo</TableCell>
-                <TableCell>Curso/Paquete</TableCell>
-                <TableCell>Pagado</TableCell>
-                <TableCell>Pendiente</TableCell>
-                <TableCell>Cuotas pagadas</TableCell>
-                <TableCell>Cuotas pendientes</TableCell>
-                <TableCell>Fecha de Vencimiento</TableCell>
+                <TableCell className="admin-table-head-cell">Estudiante</TableCell>
+                <TableCell className="admin-table-head-cell">Ciclo</TableCell>
+                <TableCell className="admin-table-head-cell">Curso/Paquete</TableCell>
+                <TableCell className="admin-table-head-cell">Pagado</TableCell>
+                <TableCell className="admin-table-head-cell">Pendiente</TableCell>
+                <TableCell className="admin-table-head-cell">Cuotas pagadas</TableCell>
+                <TableCell className="admin-table-head-cell">Cuotas pendientes</TableCell>
+                <TableCell className="admin-table-head-cell">Fecha de Vencimiento</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -419,21 +429,21 @@ const AdminDashboard = () => {
                   return true;
                 })
                 .map((row) => (
-                  <TableRow key={`${row.student_id}-${row.enrollment_id}`}>
-                    <TableCell>{row.student_name}</TableCell>
-                    <TableCell>{row.cycle_name}</TableCell>
-                    <TableCell>{row.enrolled_item}</TableCell>
-                    <TableCell>S/. {parseFloat(row.total_paid || 0).toFixed(2)}</TableCell>
-                    <TableCell>S/. {parseFloat(row.total_pending || 0).toFixed(2)}</TableCell>
-                    <TableCell>
+                  <TableRow key={`${row.student_id}-${row.enrollment_id}`} className="admin-table-row">
+                    <TableCell className="admin-table-cell">{row.student_name}</TableCell>
+                    <TableCell className="admin-table-cell">{row.cycle_name}</TableCell>
+                    <TableCell className="admin-table-cell">{row.enrolled_item}</TableCell>
+                    <TableCell className="admin-table-cell">S/. {parseFloat(row.total_paid || 0).toFixed(2)}</TableCell>
+                    <TableCell className="admin-table-cell">S/. {parseFloat(row.total_pending || 0).toFixed(2)}</TableCell>
+                    <TableCell className="admin-table-cell">
                       {(() => {
                         const pending = parseFloat(row.total_pending || 0) || 0;
                         // Mientras no exista pago en partes, considerar solo 0 o 1 cuota pagada
                         return pending > 0 ? 0 : 1;
                       })()}
                     </TableCell>
-                    <TableCell>{row.pending_installments}</TableCell>
-                    <TableCell>
+                    <TableCell className="admin-table-cell">{row.pending_installments}</TableCell>
+                    <TableCell className="admin-table-cell">
                       {row.next_due_date
                         ? new Date(row.next_due_date).toLocaleDateString()
                         : '-'}
@@ -472,15 +482,15 @@ const AdminDashboard = () => {
             </FormControl>
           </Box>
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
+          <TableContainer component={Paper} className="admin-table-container">
+            <Table className="admin-table">
+              <TableHead className="admin-table-head">
                 <TableRow>
-                  <TableCell>Estudiante</TableCell>
-                  <TableCell>Ciclo</TableCell>
-                  <TableCell>Curso</TableCell>
-                  <TableCell>Asistencia</TableCell>
-                  <TableCell>Alerta</TableCell>
+                  <TableCell className="admin-table-head-cell">Estudiante</TableCell>
+                  <TableCell className="admin-table-head-cell">Ciclo</TableCell>
+                  <TableCell className="admin-table-head-cell">Curso</TableCell>
+                  <TableCell className="admin-table-head-cell">Asistencia</TableCell>
+                  <TableCell className="admin-table-head-cell">Alerta</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -494,10 +504,10 @@ const AdminDashboard = () => {
                     return label === selectedCourse;
                   })
                   .map((row) => (
-                    <TableRow key={`${row.student_id}-${row.enrollment_id}`}>
-                      <TableCell>{row.student_name}</TableCell>
-                      <TableCell>{row.cycle_name}</TableCell>
-                      <TableCell>
+                    <TableRow key={`${row.student_id}-${row.enrollment_id}`} className="admin-table-row">
+                      <TableCell className="admin-table-cell">{row.student_name}</TableCell>
+                      <TableCell className="admin-table-cell">{row.cycle_name}</TableCell>
+                      <TableCell className="admin-table-cell">
                         {row.grupo
                           ? `${row.enrolled_item} - Grupo ${row.grupo}`
                           : row.enrolled_item}

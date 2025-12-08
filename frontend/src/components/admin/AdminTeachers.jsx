@@ -1,13 +1,39 @@
 // src/components/admin/AdminTeachers.jsx
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Tooltip } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, RestartAlt as RestartAltIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  IconButton,
+  Tooltip,
+  InputAdornment
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  RestartAlt as RestartAltIcon,
+  Search as SearchIcon
+} from '@mui/icons-material';
 import { teachersAPI } from '../../services/api';
+import './admin-dashboard.css';
 
 const AdminTeachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [form, setForm] = useState({ first_name: '', last_name: '', dni: '', phone: '', email: '', specialization: '' });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchTeachers = async () => {
     try {
@@ -49,67 +75,162 @@ const AdminTeachers = () => {
     }
   };
 
+  const getFilteredTeachers = () => {
+    if (!searchQuery) return teachers;
+    return teachers.filter(t =>
+      (t.name && t.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (t.dni && t.dni.includes(searchQuery)) ||
+      (t.email && t.email.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
   useEffect(() => { fetchTeachers(); }, []);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Docentes</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenDialog(true)}>Nuevo Docente</Button>
+    <Box className="admin-dashboard">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" className="admin-dashboard-title">Gestión de Docentes</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setOpenDialog(true)}
+          className="admin-button admin-button-primary"
+        >
+          Nuevo Docente
+        </Button>
       </Box>
-      <Paper>
-        <Table>
-          <TableHead>
+
+      {/* Search Bar */}
+      <Box mb={3} className="admin-filters">
+        <TextField
+          fullWidth
+          placeholder="Buscar docentes por nombre, DNI o email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+          className="admin-input"
+          size="small"
+        />
+      </Box>
+
+      <TableContainer component={Paper} className="admin-table-container">
+        <Table className="admin-table">
+          <TableHead className="admin-table-head">
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>DNI</TableCell>
-              <TableCell>Teléfono</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Especialidad</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell className="admin-table-head-cell">ID</TableCell>
+              <TableCell className="admin-table-head-cell">Nombre</TableCell>
+              <TableCell className="admin-table-head-cell">DNI</TableCell>
+              <TableCell className="admin-table-head-cell">Teléfono</TableCell>
+              <TableCell className="admin-table-head-cell">Email</TableCell>
+              <TableCell className="admin-table-head-cell">Especialidad</TableCell>
+              <TableCell className="admin-table-head-cell">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {teachers.map(t => (
-              <TableRow key={t.id}>
-                <TableCell>{t.id}</TableCell>
-                <TableCell>{t.name}</TableCell>
-                <TableCell>{t.dni}</TableCell>
-                <TableCell>{t.phone}</TableCell>
-                <TableCell>{t.email}</TableCell>
-                <TableCell>{t.specialization || '-'}</TableCell>
-                <TableCell>
+            {getFilteredTeachers().map(t => (
+              <TableRow key={t.id} className="admin-table-row">
+                <TableCell className="admin-table-cell">{t.id}</TableCell>
+                <TableCell className="admin-table-cell">
+                  <Typography variant="subtitle2" fontWeight="bold">{t.name}</Typography>
+                </TableCell>
+                <TableCell className="admin-table-cell">{t.dni}</TableCell>
+                <TableCell className="admin-table-cell">{t.phone}</TableCell>
+                <TableCell className="admin-table-cell">{t.email}</TableCell>
+                <TableCell className="admin-table-cell">{t.specialization || '-'}</TableCell>
+                <TableCell className="admin-table-cell">
                   <Tooltip title="Reiniciar contraseña a DNI">
-                    <IconButton size="small" onClick={() => handleResetPassword(t.id)}>
+                    <IconButton size="small" onClick={() => handleResetPassword(t.id)} className="admin-icon-button">
                       <RestartAltIcon />
                     </IconButton>
                   </Tooltip>
-                  <IconButton size="small" color="error" onClick={() => handleDelete(t.id)}>
+                  <IconButton size="small" color="error" onClick={() => handleDelete(t.id)} className="admin-icon-button">
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
             ))}
+            {getFilteredTeachers().length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                  <Typography color="text.secondary">
+                    {searchQuery ? 'No se encontraron docentes' : 'No hay docentes registrados'}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
-      </Paper>
+      </TableContainer>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth className="admin-dialog">
         <DialogTitle>Nuevo Docente</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="Nombres" value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} fullWidth />
-            <TextField label="Apellidos" value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} fullWidth />
-            <TextField label="DNI" value={form.dni} onChange={(e) => setForm({ ...form, dni: e.target.value })} fullWidth />
-            <TextField label="Teléfono" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} fullWidth />
-            <TextField label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} fullWidth />
-            <TextField label="Especialidad" value={form.specialization} onChange={(e) => setForm({ ...form, specialization: e.target.value })} fullWidth />
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, pt: 2 }}>
+            <TextField
+              label="Nombres"
+              value={form.first_name}
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: Juan Carlos"
+            />
+            <TextField
+              label="Apellidos"
+              value={form.last_name}
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: Pérez López"
+            />
+            <TextField
+              label="DNI"
+              value={form.dni}
+              onChange={(e) => setForm({ ...form, dni: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: 12345678"
+            />
+            <TextField
+              label="Teléfono"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: 987654321"
+            />
+            <TextField
+              label="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: profesor@academia.com"
+              sx={{ gridColumn: '1 / -1' }}
+            />
+            <TextField
+              label="Especialidad"
+              value={form.specialization}
+              onChange={(e) => setForm({ ...form, specialization: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: Matemáticas"
+              sx={{ gridColumn: '1 / -1' }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleCreate}>Crear</Button>
+          <Button onClick={() => setOpenDialog(false)} className="admin-button admin-button-secondary">
+            Cancelar
+          </Button>
+          <Button variant="contained" onClick={handleCreate} className="admin-button admin-button-primary">
+            Crear Docente
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { cyclesAPI } from '../../services/api';
+import './admin-dashboard.css';
 
 const AdminCycles = () => {
   const [cycles, setCycles] = useState([]);
@@ -134,51 +135,53 @@ const AdminCycles = () => {
   };
 
   return (
-    <Box>
+    <Box className="admin-dashboard">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Gestión de Ciclos</Typography>
+        <Typography variant="h4" className="admin-dashboard-title">Gestión de Ciclos</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpenDialog()}
+          className="admin-button admin-button-primary"
         >
           Nuevo Ciclo
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
+      <TableContainer component={Paper} className="admin-table-container">
+        <Table className="admin-table">
+          <TableHead className="admin-table-head">
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Fecha Inicio</TableCell>
-              <TableCell>Fecha Fin</TableCell>
-              <TableCell>Duración (meses)</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell className="admin-table-head-cell">ID</TableCell>
+              <TableCell className="admin-table-head-cell">Nombre</TableCell>
+              <TableCell className="admin-table-head-cell">Fecha Inicio</TableCell>
+              <TableCell className="admin-table-head-cell">Fecha Fin</TableCell>
+              <TableCell className="admin-table-head-cell">Duración (meses)</TableCell>
+              <TableCell className="admin-table-head-cell">Estado</TableCell>
+              <TableCell className="admin-table-head-cell">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {cycles.map((cycle) => (
-              <TableRow key={cycle.id}>
-                <TableCell>{cycle.id}</TableCell>
-                <TableCell>{cycle.name}</TableCell>
-                <TableCell>{new Date(cycle.start_date).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(cycle.end_date).toLocaleDateString()}</TableCell>
-                <TableCell>{cycle.duration_months || '-'}</TableCell>
-                <TableCell>
+              <TableRow key={cycle.id} className="admin-table-row">
+                <TableCell className="admin-table-cell">{cycle.id}</TableCell>
+                <TableCell className="admin-table-cell">{cycle.name}</TableCell>
+                <TableCell className="admin-table-cell">{new Date(cycle.start_date).toLocaleDateString()}</TableCell>
+                <TableCell className="admin-table-cell">{new Date(cycle.end_date).toLocaleDateString()}</TableCell>
+                <TableCell className="admin-table-cell">{cycle.duration_months || '-'}</TableCell>
+                <TableCell className="admin-table-cell">
                   <Chip
                     label={getStatusLabel(cycle.status)}
                     color={getStatusColor(cycle.status)}
                     size="small"
+                    className="admin-chip"
                   />
                 </TableCell>
-                <TableCell>
-                  <IconButton size="small" onClick={() => handleOpenDialog(cycle)}>
+                <TableCell className="admin-table-cell">
+                  <IconButton size="small" onClick={() => handleOpenDialog(cycle)} className="admin-icon-button">
                     <EditIcon />
                   </IconButton>
-                  <IconButton size="small" color="error" onClick={() => handleDelete(cycle.id)}>
+                  <IconButton size="small" color="error" onClick={() => handleDelete(cycle.id)} className="admin-icon-button">
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -203,46 +206,76 @@ const AdminCycles = () => {
               fullWidth
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="admin-input"
+              placeholder="Ej: Ciclo 2024-1"
             />
-            <TextField
-              label="Fecha Inicio"
-              type="date"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-            />
-            <TextField
-              label="Fecha Fin"
-              type="date"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-            />
-            <TextField
-              label="Duración (meses)"
-              type="number"
-              fullWidth
-              value={formData.duration_months}
-              onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
-            />
-            <TextField
-              label="Estado"
-              select
-              fullWidth
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            >
-              <MenuItem value="open">Abierto</MenuItem>
-              <MenuItem value="in_progress">En Progreso</MenuItem>
-              <MenuItem value="closed">Cerrado</MenuItem>
-            </TextField>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <TextField
+                label="Fecha Inicio"
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  style: { cursor: 'pointer' },
+                  onClick: (e) => e.target.showPicker && e.target.showPicker()
+                }}
+                value={formData.start_date}
+                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                className="admin-input cursor-pointer"
+                helperText="Haz clic para seleccionar la fecha"
+                onClick={(e) => {
+                  const input = e.target.querySelector('input');
+                  if (input && input.showPicker) input.showPicker();
+                }}
+              />
+              <TextField
+                label="Fecha Fin"
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  style: { cursor: 'pointer' },
+                  min: formData.start_date || undefined,
+                  onClick: (e) => e.target.showPicker && e.target.showPicker()
+                }}
+                value={formData.end_date}
+                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                className="admin-input cursor-pointer"
+                helperText="Haz clic para seleccionar la fecha"
+                onClick={(e) => {
+                  const input = e.target.querySelector('input');
+                  if (input && input.showPicker) input.showPicker();
+                }}
+              />
+            </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <TextField
+                label="Duración (meses)"
+                type="number"
+                fullWidth
+                value={formData.duration_months}
+                onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
+                className="admin-input"
+                placeholder="Ej: 6"
+              />
+              <TextField
+                label="Estado"
+                select
+                fullWidth
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="admin-input admin-select"
+              >
+                <MenuItem value="open">Abierto</MenuItem>
+                <MenuItem value="in_progress">En Progreso</MenuItem>
+                <MenuItem value="closed">Cerrado</MenuItem>
+              </TextField>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={handleSubmit} variant="contained">
+          <Button onClick={handleCloseDialog} className="admin-button admin-button-secondary">Cancelar</Button>
+          <Button onClick={handleSubmit} variant="contained" className="admin-button admin-button-primary">
             {editingCycle ? 'Actualizar' : 'Crear'}
           </Button>
         </DialogActions>

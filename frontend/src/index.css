@@ -1,11 +1,18 @@
+/* Importar sistema de diseño */
+@import './design-system.css';
+
+/* =========================================
+   ESTILOS BASE MEJORADOS
+   ========================================= */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  font-weight: var(--font-normal);
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: var(--gray-900);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,58 +20,171 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* --- CORRECCIÓN AQUÍ --- */
+a {
+  font-weight: var(--font-medium);
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  /* Eliminamos display: flex y place-items: center para que no se centre */
-  display: block; 
+  display: block;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-bold);
+  line-height: 1.2;
+  color: inherit;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: var(--text-5xl);
+  font-weight: var(--font-extrabold);
 }
 
+h2 {
+  font-size: var(--text-4xl);
+}
+
+h3 {
+  font-size: var(--text-3xl);
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: var(--space-4);
+}
+
+/* Botones base mejorados */
 button {
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  font-family: var(--font-primary);
+  background-color: var(--primary);
+  color: var(--white);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
 }
+
 button:hover {
-  border-color: #646cff;
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
+
+button:active {
+  transform: translateY(0);
+}
+
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Inputs mejorados */
+input,
+textarea,
+select {
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  background-color: var(--white);
+  color: var(--gray-900);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Modo claro */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--gray-900);
+    background-color: var(--white);
   }
+
   a:hover {
-    color: #747bff;
+    color: var(--primary-light);
   }
+
   button {
-    background-color: #f9f9f9;
+    background-color: var(--primary);
   }
+
+  button:hover {
+    background-color: var(--primary-dark);
+  }
+}
+
+/* Utilidades de display */
+.hidden {
+  display: none !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.grid {
+  display: grid;
+}
+
+/* Utilidades de texto */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-bold {
+  font-weight: var(--font-bold);
+}
+
+.font-semibold {
+  font-weight: var(--font-semibold);
 }

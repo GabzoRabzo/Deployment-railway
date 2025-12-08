@@ -9,6 +9,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TableContainer,
   TextField,
   Button,
   Tabs,
@@ -18,11 +19,19 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  InputAdornment,
+  Chip,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Search as SearchIcon,
+  Edit as EditIcon
+} from '@mui/icons-material';
 import { packagesAPI, cyclesAPI, coursesAPI } from '../../services/api';
 import { Checkbox, ListItemText } from '@mui/material';
 import { MenuItem } from '@mui/material';
+import './admin-dashboard.css';
 
 const AdminPackages = () => {
   const [packages, setPackages] = useState([]);
@@ -37,13 +46,16 @@ const AdminPackages = () => {
   const [courses, setCourses] = useState([]);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
   const [assignForm, setAssignForm] = useState({ package_id: '', course_id: '' });
-  
+
   // Manage mapping: package_offering -> course_offerings
   const [openOfferingCoursesDialog, setOpenOfferingCoursesDialog] = useState(false);
   const [selectedPackageOffering, setSelectedPackageOffering] = useState(null);
   const [availableCourseOfferings, setAvailableCourseOfferings] = useState([]);
   const [selectedCourseOfferingIds, setSelectedCourseOfferingIds] = useState([]);
   const [currentOfferingCourses, setCurrentOfferingCourses] = useState([]);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchPackages = async () => {
     try {
@@ -236,55 +248,109 @@ const AdminPackages = () => {
     }
   };
 
-  
+
+
+  const getFilteredPackages = () => {
+    if (!searchQuery) return packages;
+    return packages.filter(p =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
+
+  const getFilteredOfferings = () => {
+    if (!searchQuery) return offerings;
+    return offerings.filter(o =>
+      (o.package_name && o.package_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (o.cycle_name && o.cycle_name.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Gestión de Paquetes</Typography>
+    <Box className="admin-dashboard">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" className="admin-dashboard-title">Gestión de Paquetes</Typography>
         <Box>
           {tabValue === 0 && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenPackageDialog(true)}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenPackageDialog(true)}
+              className="admin-button admin-button-primary"
+            >
               Nuevo Paquete
             </Button>
           )}
           {tabValue === 1 && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenOfferingDialog(true)} sx={{ ml: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenOfferingDialog(true)}
+              sx={{ ml: 1 }}
+              className="admin-button admin-button-primary"
+            >
               Nueva Oferta
             </Button>
           )}
         </Box>
       </Box>
 
-      <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ mb: 2 }}>
-        <Tab label="Paquetes" />
-        <Tab label="Ofertas" />
+      {/* Buscador Común */}
+      <Box mb={3} className="admin-filters">
+        <TextField
+          fullWidth
+          placeholder={tabValue === 0 ? "Buscar paquetes..." : "Buscar ofertas de paquetes..."}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+          className="admin-input"
+          size="small"
+        />
+      </Box>
+
+      <Tabs
+        value={tabValue}
+        onChange={(e, v) => { setTabValue(v); setSearchQuery(''); }}
+        sx={{ mb: 3 }}
+        className="admin-tabs"
+        TabIndicatorProps={{ className: 'admin-tab-indicator' }}
+      >
+        <Tab label="Paquetes" className="admin-tab" />
+        <Tab label="Ofertas" className="admin-tab" />
       </Tabs>
 
       {tabValue === 0 && (
-        <Paper>
-          <Table>
-            <TableHead>
+        <TableContainer component={Paper} className="admin-table-container">
+          <Table className="admin-table">
+            <TableHead className="admin-table-head">
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Precio base</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell>Acciones</TableCell>
+                <TableCell className="admin-table-head-cell">ID</TableCell>
+                <TableCell className="admin-table-head-cell">Nombre</TableCell>
+                <TableCell className="admin-table-head-cell">Precio base</TableCell>
+                <TableCell className="admin-table-head-cell">Descripción</TableCell>
+                <TableCell className="admin-table-head-cell">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {packages.map(p => (
-                <TableRow key={p.id}>
-                  <TableCell>{p.id}</TableCell>
-                  <TableCell>{p.name}</TableCell>
-                  <TableCell>{editing.id === p.id ? (
+              {getFilteredPackages().map(p => (
+                <TableRow key={p.id} className="admin-table-row">
+                  <TableCell className="admin-table-cell">{p.id}</TableCell>
+                  <TableCell className="admin-table-cell">
+                    <Typography variant="subtitle2" fontWeight="bold">{p.name}</Typography>
+                  </TableCell>
+                  <TableCell className="admin-table-cell">{editing.id === p.id ? (
                     <TextField size="small" type="number" value={editing.base_price} onChange={(e) => setEditing({ ...editing, base_price: e.target.value })} />
                   ) : (`S/. ${p.base_price}`)}</TableCell>
-                  <TableCell>{editing.id === p.id ? (
+                  <TableCell className="admin-table-cell">{editing.id === p.id ? (
                     <TextField size="small" value={editing.description || ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
                   ) : (p.description || '-')}</TableCell>
-                  <TableCell>
+                  <TableCell className="admin-table-cell">
                     {editing.id === p.id ? (
                       <>
                         <Button size="small" onClick={() => save(p.id)}>Guardar</Button>
@@ -292,69 +358,105 @@ const AdminPackages = () => {
                       </>
                     ) : (
                       <>
-                        <Button size="small" onClick={() => startEdit(p)}>Editar</Button>
-                        <Button size="small" color="error" onClick={() => remove(p.id)}>Eliminar</Button>
+                        <Button size="small" onClick={() => startEdit(p)} startIcon={<EditIcon />}>Editar</Button>
+                        <IconButton size="small" color="error" onClick={() => remove(p.id)} className="admin-icon-button">
+                          <DeleteIcon />
+                        </IconButton>
                       </>
                     )}
                   </TableCell>
                 </TableRow>
               ))}
+              {getFilteredPackages().length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                    <Typography color="text.secondary">No se encontraron paquetes</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-        </Paper>
+        </TableContainer>
       )}
 
       {tabValue === 1 && (
         <Box>
-          <Paper>
-            <Table>
-              <TableHead>
+          <TableContainer component={Paper} className="admin-table-container">
+            <Table className="admin-table">
+              <TableHead className="admin-table-head">
                 <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Paquete</TableCell>
-                  <TableCell>Ciclo</TableCell>
-                  <TableCell>Precio</TableCell>
-                  <TableCell>Acciones</TableCell>
+                  <TableCell className="admin-table-head-cell">ID</TableCell>
+                  <TableCell className="admin-table-head-cell">Paquete</TableCell>
+                  <TableCell className="admin-table-head-cell">Ciclo</TableCell>
+                  <TableCell className="admin-table-head-cell">Precio</TableCell>
+                  <TableCell className="admin-table-head-cell">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {offerings.map(o => (
-                  <TableRow key={o.id}>
-                    <TableCell>{o.id}</TableCell>
-                    <TableCell>{o.package_name || '-'}</TableCell>
-                    <TableCell>{o.cycle_name || '-'}</TableCell>
-                    <TableCell>S/. {parseFloat(o.base_price || 0).toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Button size="small" onClick={() => openManageOfferingCourses(o)}>Cursos ofrecidos</Button>
-                      <IconButton size="small" color="error" onClick={() => handleDeleteOffering(o.id)}>
+                {getFilteredOfferings().map(o => (
+                  <TableRow key={o.id} className="admin-table-row">
+                    <TableCell className="admin-table-cell">{o.id}</TableCell>
+                    <TableCell className="admin-table-cell">{o.package_name || '-'}</TableCell>
+                    <TableCell className="admin-table-cell">{o.cycle_name || '-'}</TableCell>
+                    <TableCell className="admin-table-cell">S/. {parseFloat(o.base_price || 0).toFixed(2)}</TableCell>
+                    <TableCell className="admin-table-cell">
+                      <Button size="small" onClick={() => openManageOfferingCourses(o)} className="admin-button-text">Cursos ofrecidos</Button>
+                      <IconButton size="small" color="error" onClick={() => handleDeleteOffering(o.id)} className="admin-icon-button">
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
+                {getFilteredOfferings().length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                      <Typography color="text.secondary">No se encontraron ofertas de paquetes</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
-          </Paper>
+          </TableContainer>
         </Box>
       )}
 
       {/* Dialog: Crear Paquete */}
-      <Dialog open={openPackageDialog} onClose={() => setOpenPackageDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={openPackageDialog} onClose={() => setOpenPackageDialog(false)} maxWidth="sm" fullWidth className="admin-dialog">
         <DialogTitle>Nuevo Paquete</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="Nombre" value={packageForm.name} onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })} fullWidth />
-            <TextField label="Descripción" value={packageForm.description} onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })} fullWidth />
-            <TextField label="Precio base" type="number" value={packageForm.base_price} onChange={(e) => setPackageForm({ ...packageForm, base_price: e.target.value })} fullWidth />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
+            <TextField
+              label="Nombre del Paquete"
+              value={packageForm.name}
+              onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
+              fullWidth
+              className="admin-input"
+              placeholder="Ej: Pack Verano 2024"
+            />
+            <TextField
+              label="Descripción"
+              value={packageForm.description}
+              onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
+              fullWidth
+              className="admin-input"
+              multiline rows={2}
+            />
+            <TextField
+              label="Precio base (S/.)"
+              type="number"
+              value={packageForm.base_price}
+              onChange={(e) => setPackageForm({ ...packageForm, base_price: e.target.value })}
+              fullWidth
+              className="admin-input"
+              InputProps={{ startAdornment: <InputAdornment position="start">S/.</InputAdornment> }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenPackageDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleCreatePackage}>Crear</Button>
+          <Button onClick={() => setOpenPackageDialog(false)} className="admin-button admin-button-secondary">Cancelar</Button>
+          <Button variant="contained" onClick={handleCreatePackage} className="admin-button admin-button-primary">Crear Paquete</Button>
         </DialogActions>
       </Dialog>
-
-      
 
       {/* Dialog: Asignar/Quitar Cursos a Paquete */}
       <Dialog open={openAssignDialog} onClose={() => setOpenAssignDialog(false)} maxWidth="sm" fullWidth>
@@ -384,16 +486,30 @@ const AdminPackages = () => {
       </Dialog>
 
       {/* Dialog: Crear Oferta de Paquete */}
-      <Dialog open={openOfferingDialog} onClose={() => setOpenOfferingDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={openOfferingDialog} onClose={() => setOpenOfferingDialog(false)} maxWidth="sm" fullWidth className="admin-dialog">
         <DialogTitle>Nueva Oferta de Paquete</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField select label="Paquete" value={offeringForm.package_id} onChange={(e) => setOfferingForm({ ...offeringForm, package_id: e.target.value })} fullWidth>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, pt: 2 }}>
+            <TextField
+              select
+              label="Paquete"
+              value={offeringForm.package_id}
+              onChange={(e) => setOfferingForm({ ...offeringForm, package_id: e.target.value })}
+              fullWidth
+              className="admin-input admin-select"
+            >
               {packages.map(p => (
                 <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
               ))}
             </TextField>
-            <TextField select label="Ciclo" value={offeringForm.cycle_id} onChange={(e) => setOfferingForm({ ...offeringForm, cycle_id: e.target.value })} fullWidth>
+            <TextField
+              select
+              label="Ciclo"
+              value={offeringForm.cycle_id}
+              onChange={(e) => setOfferingForm({ ...offeringForm, cycle_id: e.target.value })}
+              fullWidth
+              className="admin-input admin-select"
+            >
               {cycles.map(c => (
                 <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
               ))}
@@ -401,27 +517,27 @@ const AdminPackages = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenOfferingDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleCreateOffering}>Crear</Button>
+          <Button onClick={() => setOpenOfferingDialog(false)} className="admin-button admin-button-secondary">Cancelar</Button>
+          <Button variant="contained" onClick={handleCreateOffering} className="admin-button admin-button-primary">Crear</Button>
         </DialogActions>
       </Dialog>
 
       {/* Dialog: Vincular course_offerings a una package_offering */}
-      <Dialog open={openOfferingCoursesDialog} onClose={() => setOpenOfferingCoursesDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={openOfferingCoursesDialog} onClose={() => setOpenOfferingCoursesDialog(false)} maxWidth="sm" fullWidth className="admin-dialog">
         <DialogTitle>Seleccionar cursos ofrecidos para el paquete</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Paquete: {selectedPackageOffering?.package_name || selectedPackageOffering?.package_id} · Ciclo: {selectedPackageOffering?.cycle_name || selectedPackageOffering?.cycle_id}
+          <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+            Paquete: <strong>{selectedPackageOffering?.package_name}</strong> · Ciclo: <strong>{selectedPackageOffering?.cycle_name}</strong>
           </Typography>
           <TextField
-            label="Cursos ofrecidos"
+            label="Cursos Disponibles"
             select
             fullWidth
             SelectProps={{ multiple: true, renderValue: (selected) => `${selected.length} seleccionados` }}
             value={selectedCourseOfferingIds}
             onChange={(e) => setSelectedCourseOfferingIds(typeof e.target.value === 'string' ? e.target.value.split(',').map(Number) : e.target.value)}
-            helperText="Selecciona los course_offerings (grupo/docente) que conforman este paquete"
-            sx={{ mt: 1 }}
+            helperText="Selecciona los cursos que conforman este paquete"
+            className="admin-input admin-select"
           >
             {availableCourseOfferings.map(opt => (
               <MenuItem key={opt.id} value={opt.id}>
@@ -431,14 +547,21 @@ const AdminPackages = () => {
             ))}
           </TextField>
           {currentOfferingCourses && currentOfferingCourses.length > 0 && (
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
-              Actualmente vinculados: {currentOfferingCourses.map(m => m.course_offering_id).join(', ')}
-            </Typography>
+            <Box mt={2} p={2} bgcolor="background.paper" borderRadius={1} border="1px solid #eee">
+              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                Actualmente vinculados:
+              </Typography>
+              <Box display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                {currentOfferingCourses.map(m => (
+                  <Chip key={m.course_offering_id} label={`ID: ${m.course_offering_id}`} size="small" />
+                ))}
+              </Box>
+            </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenOfferingCoursesDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={saveOfferingCourses}>Guardar</Button>
+          <Button onClick={() => setOpenOfferingCoursesDialog(false)} className="admin-button admin-button-secondary">Cancelar</Button>
+          <Button variant="contained" onClick={saveOfferingCourses} className="admin-button admin-button-primary">Guardar</Button>
         </DialogActions>
       </Dialog>
     </Box>
