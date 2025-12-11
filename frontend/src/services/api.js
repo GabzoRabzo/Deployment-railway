@@ -1,7 +1,7 @@
 // src/services/api.js
 // Servicio centralizado para manejar todas las peticiones API
 
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 // Función helper para hacer peticiones
 async function request(endpoint, options = {}) {

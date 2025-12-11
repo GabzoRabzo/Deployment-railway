@@ -20,10 +20,13 @@ from routes import (
 
 app = FastAPI(title="Academia API", version="2.0.0")
 
-# CORS
+# CORS - Configuración mejorada para desarrollo y producción
+# Obtener orígenes permitidos desde variable de entorno o usar defaults
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=ALLOWED_ORIGINS,  # Lista específica de orígenes permitidos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,6 +52,7 @@ app.include_router(admin.router, prefix="/api")
 async def startup():
     await get_db_pool()
     print("✓ Database pool created")
+    print(f"✓ CORS enabled for origins: {ALLOWED_ORIGINS}")
 
 @app.on_event("shutdown")
 async def shutdown():

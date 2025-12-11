@@ -1,6 +1,19 @@
+# Environment variables
 .env
-.env.docker
-node_modules/
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Uploads
 uploads/
-__pycache__
-.venv/

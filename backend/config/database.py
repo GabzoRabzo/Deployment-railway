@@ -4,7 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = f"postgresql://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'academia_final')}"
+DATABASE_URL = os.getenv('DATABASE_URL') or \
+    f"postgresql://{os.getenv('DB_USER', 'postgres')}:" \
+    f"{os.getenv('DB_PASSWORD')}@" \
+    f"{os.getenv('DB_HOST', 'localhost')}:" \
+    f"{os.getenv('DB_PORT', '5432')}/" \
+    f"{os.getenv('DB_NAME', 'academia_final')}"
 
 pool = None
 
