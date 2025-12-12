@@ -1,35 +1,36 @@
 # ========================================
-# Etapa 1: Build
+# Stage 1: Build
 # ========================================
-FROM node:20-alpine AS build
+FROM node:20-alpine as build
 
 WORKDIR /app
 
 # Copiar package files
 COPY package*.json ./
 
-# Copiar configuración de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Instalar TODAS las dependencias (incluyendo devDependencies)
-RUN npm ci
+# Instalar dependencias
+RUN npm ci --only=production
 
 # Copiar código fuente
 COPY . .
+
+# ⚠️ IMPORTANTE: Recibir la variable de Railway
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
 # Build de producción
 RUN npm run build
 
 # ========================================
-# Etapa 2: Producción con Nginx
+# Stage 2: Production con Nginx
 # ========================================
 FROM nginx:alpine
 
-# Copiar build desde la etapa anterior
+# Copiar el build al directorio de nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar configuración de nginx (si la tienes)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar configuración de nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
