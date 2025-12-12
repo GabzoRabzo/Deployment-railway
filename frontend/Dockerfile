@@ -8,6 +8,9 @@ WORKDIR /app
 # Copiar package files
 COPY package*.json ./
 
+# Copiar configuración de nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Instalar TODAS las dependencias (incluyendo devDependencies)
 RUN npm ci
 
