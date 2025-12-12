@@ -1,36 +1,32 @@
 # ========================================
-# Stage 1: Build
+# Etapa 1: Build
 # ========================================
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
 # Copiar package files
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Instalar TODAS las dependencias (incluyendo devDependencies)
+RUN npm ci
 
 # Copiar código fuente
 COPY . .
-
-# Argumento para la URL del API (se inyecta en build time)
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
 
 # Build de producción
 RUN npm run build
 
 # ========================================
-# Stage 2: Production con Nginx
+# Etapa 2: Producción con Nginx
 # ========================================
 FROM nginx:alpine
 
-# Copiar el build al directorio de nginx
+# Copiar build desde la etapa anterior
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar configuración de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar configuración de nginx (si la tienes)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
